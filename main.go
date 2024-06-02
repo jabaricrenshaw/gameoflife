@@ -1,7 +1,7 @@
 package main
 
 import (
-    "gameoflife/types"
+    "github.com/jabaricrenshaw/gameoflife/types"
 )
 
 // Structures
@@ -197,8 +197,8 @@ func (gme *Game) Start() {
 */
 
 func main(){
-    g := Game{
-        target_fps: 5,
+    g := gameoflife.Game{
+        Target_fps: 5,
     }
 
     g.Start()

@@ -10,7 +10,7 @@ import (
 type Game struct {
     container	    *Container
     opts            *Options
-    target_fps	    float64
+    Target_fps	    float64
     frame_counter   int
 }
 
@@ -66,10 +66,10 @@ func (gme *Game) Start() {
     gme.container = NewContainer(gme.opts.width, gme.opts.height)
     gme.init_cells()
     
-    wait_time_ms := (1000.00/gme.target_fps)
+    wait_time_ms := (1000.00/gme.Target_fps)
     for {
         gme.frame_counter++
-        fmt.Printf("Frames elapsed: %d\n%.2f FPS (%.2f ms/frame)\n%s\n", gme.frame_counter, gme.target_fps, wait_time_ms, gme.container)
+        fmt.Printf("Frames elapsed: %d\n%.2f FPS (%.2f ms/frame)\n%s\n", gme.frame_counter, gme.Target_fps, wait_time_ms, gme.container)
         gme.container.update()
         time.Sleep(time.Duration(wait_time_ms) * time.Millisecond)
     }
