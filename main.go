@@ -1,12 +1,12 @@
 package main
 
-import "github.com/jabaricrenshaw/gameoflife/types"
+import gameoflife "github.com/jabaricrenshaw/gameoflife/types"
 
-func main(){
-    g := gameoflife.Game{
-        Target_fps: 5,
-    }
+func main() {
+	// 5 FPS is reasonable for scrolling text
+	g := gameoflife.Game{
+		Target_fps: 5,
+	}
 
-    g.Start()
-} 
-
+	g.Start()
+}
