@@ -13,13 +13,16 @@ type Game struct {
 	container     *Container
 	frame_counter int
 	Target_fps    float64
+	Data          chan string
 }
 
+/*
 // int16 is a suitable type for our use case
 type Options struct {
 	width  int16
 	height int16
 }
+*/
 
 func (gme *Game) init_cells() {
 	fmt.Println(gme.container)
@@ -44,7 +47,7 @@ func (gme *Game) init_cells() {
 	}
 }
 
-func get_opts() Options {
+func get_window_opts() (w int16, h int16) {
 	for {
 		var temp_w, temp_h int16 = -1, -1
 		fmt.Printf("Grid size? (WxH): ")
@@ -55,12 +58,12 @@ func get_opts() Options {
 		} else if temp_w <= 0 || temp_h <= 0 {
 			fmt.Println("Invalid size!\n")
 		} else if n == 2 {
-			return Options{
-				width:  temp_w,
-				height: temp_h,
-			}
+			w, h = temp_w, temp_h
+			break
 		}
 	}
+
+	return
 }
 
 func getInputErr(err error) string {
@@ -82,12 +85,13 @@ func (gme *Game) Start() {
 		os.Exit(0)
 	}()
 
-	windowOpts := get_opts()
 	gme = &Game{
-		container:     NewContainer(windowOpts.width, windowOpts.height),
-		Target_fps:    gme.Target_fps,
+		container:     NewContainer(get_window_opts()),
 		frame_counter: 0,
+		Target_fps:    gme.Target_fps,
+		Data:          make(chan string, 2),
 	}
+	defer close(gme.Data)
 
 	// Setting up game loop timer
 	frame_wait_time := time.Second / time.Duration(gme.Target_fps)
@@ -97,15 +101,20 @@ func (gme *Game) Start() {
 	// Getting user input to activate cells
 	gme.init_cells()
 
-	// Main game loop
-	for range t.C {
-		// Incrementing counter and showing stats
-		gme.frame_counter++
-		fmt.Printf("Frames elapsed: %d (%.2f FPS @ %s/frame)\n%s", gme.frame_counter, gme.Target_fps, frame_wait_time, gme.container)
+	for {
+		select {
+		case <-t.C:
+			// Incrementing counter and showing stats
+			gme.frame_counter++
+			fmt.Printf("Frames elapsed: %d (%.2f FPS @ %s/frame)\n%s", gme.frame_counter, gme.Target_fps, frame_wait_time, gme.container)
+			//gme.Data <- gme.container.String()
 
-		// Timing this frame update
-		start_frame_gen := time.Now()
-		gme.container.update()
-		fmt.Printf("(frame gen took: %s)\n\n", time.Since(start_frame_gen))
+			// Timing this frame update
+			start_frame_gen := time.Now()
+			gme.container.update()
+			fmt.Printf("(frame gen took: %s)\n\n", time.Since(start_frame_gen))
+		case <-c:
+			return
+		}
 	}
 }
